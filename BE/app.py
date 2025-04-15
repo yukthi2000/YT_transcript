@@ -32,9 +32,22 @@ def extract_video_id(url):
     return None
 
 
-@app.route('/link', methods=['POST'])
+@app.route('/link', methods=['POST','OPTIONS'])
+# @cross_origin
 def getlink():
+    if request.method == 'OPTIONS':
+        return '',200
+    
+    print("Request received")
+    print("request data : ", request.data)
+
     data = request.get_json()
+
+    if not data :
+        print("No data received")
+        return jsonify({"error": "No data received"}), 400
+    
+
     url = data.get('link')
     video_id = extract_video_id(url)
     if not video_id:
@@ -64,6 +77,13 @@ def getlink():
 
 
 # @app.route('/transcript', methods=['POST'])
+
+
+# @app.after_request
+# def after_request(response):
+#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#     return response
 
 
 if __name__ == "__main__":
