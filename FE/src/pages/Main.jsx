@@ -8,6 +8,7 @@ const Main = () => {
     const [error, setError] = useState('')
 
     const handleSubmit = async(e) => {
+        setid('')
         e.preventDefault()
 
         if(!link)
