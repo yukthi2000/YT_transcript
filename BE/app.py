@@ -3,7 +3,7 @@ from youtube_transcript_api import TranscriptsDisabled, NoTranscriptFound, Video
 import re 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-
+import requests
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -31,6 +31,15 @@ def extract_video_id(url):
             return match.group(1)
     return None
 
+def check_video_availability(video_id):
+    """Checks if the video is available."""
+    response = requests.head(f"https://www.youtube.com/watch?v={video_id}")
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+        
+
 
 @app.route('/link', methods=['POST','OPTIONS'])
 # @cross_origin
@@ -52,7 +61,9 @@ def getlink():
     video_id = extract_video_id(url)
     if not video_id:
         return jsonify({"error": "Invalid YouTube URL"}), 400
-    
+    vidav= check_video_availability(video_id)
+    if not vidav:
+        return jsonify({"error": "Video is not available"}), 400
     return jsonify({"video_id": video_id}), 200
 
 
